@@ -3,6 +3,7 @@ const app = require('../app')
 const request = require('supertest')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data')
+const endpoints = require('../endpoints.json')
 
 beforeEach(()=>{
     return seed(testData)
@@ -10,7 +11,13 @@ beforeEach(()=>{
 afterAll(()=>{
     return db.end()
 })
-
+describe('GET /*', ()=>{
+    test('should return a 404 status when an attempt to access a non existent endpoint is made', ()=>{
+        return request(app)
+        .get('/non-existing')
+        .expect(404)
+    })
+})
 describe('GET /api/topics', ()=>{
     test('should return 200 status code', ()=>{
         return request(app)
@@ -42,4 +49,28 @@ describe('GET /api/topics', ()=>{
     })
     
 
+})
+describe('GET /api', ()=>{
+    test('should return an object with all valid endpoints and their methods as properties',()=>{
+        return request(app)
+        .get('/api')
+        .then(({body})=>{
+            const appRouteNames = []
+            app._router.stack.forEach((r)=>{
+                if(r.route && r.route.path){
+                    if(r.route.path !== '/*'){ //exclude invalid endpoints
+                        Object.keys(r.route.methods)
+                        .forEach((method) => {
+                            appRouteNames.push(`${method.toUpperCase()} ${r.route.path}`)
+                        })
+                    }
+                } 
+            })
+            let hasAllProperties = true
+            Object.keys(endpoints).forEach((endpoint)=>{
+                if (!appRouteNames.includes(endpoint)) hasAllProperties = false
+            })
+            expect(hasAllProperties).toBe(true)
+        })
+    })
 })
