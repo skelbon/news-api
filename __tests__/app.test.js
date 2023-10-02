@@ -67,8 +67,8 @@ describe('GET /api', ()=>{
                 } 
             })
             let hasAllProperties = true
-            Object.keys(endpoints).forEach((endpoint)=>{
-                if (!appRouteNames.includes(endpoint)) hasAllProperties = false
+            appRouteNames.forEach((route)=>{
+                if (!Object.keys(endpoints).includes(route)) hasAllProperties = false
             })
             expect(hasAllProperties).toBe(true)
         })
