@@ -10,7 +10,13 @@ beforeEach(()=>{
 afterAll(()=>{
     return db.end()
 })
-
+describe('GET /*', ()=>{
+    test('should return a 404 status when an attempt to access a non existent endpoint is made', ()=>{
+        return request(app)
+        .get('/non-existing')
+        .expect(404)
+    })
+})
 describe('GET /api/topics', ()=>{
     test('should return 200 status code', ()=>{
         return request(app)
@@ -40,6 +46,4 @@ describe('GET /api/topics', ()=>{
             })
         })
     })
-    
-
 })

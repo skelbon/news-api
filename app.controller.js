@@ -1,4 +1,5 @@
 const {fetchTopics} = require('./app.model')
+const endpoints = require('./endpoints.json')
 
 exports.getTopics = (req, res, next)=>{
     fetchTopics().then((topics)=>{
@@ -7,4 +8,8 @@ exports.getTopics = (req, res, next)=>{
         }
         res.status(200).send({topics})
     })
+}
+
+exports.getApiDescription = (req,res, next)=>{
+    res.status(200).send(JSON.stringify(endpoints))
 }
