@@ -14,10 +14,8 @@ exports.getApiDescription = (req, res, next)=>{
 }
 
 exports.getArticleById = (req, res, next)=>{
-    console.log('IN CONTROLLER')
-    console.log(req.params.article_id)
-    
+
     fetchArticleById(req.params.article_id).then((article)=>{
         res.status(200).send(article)
-    })
+    }).catch( err => res.status(400).send(err))
 }
