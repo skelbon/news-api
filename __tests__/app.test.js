@@ -5,6 +5,7 @@ const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data')
 const endpoints = require('../endpoints.json')
 
+
 beforeEach(()=>{
     return seed(testData)
 })
@@ -108,5 +109,50 @@ describe('GET /api/articles/:article_id', ()=>{
         .then(({body})=>{
             expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
         })
+    })
+})
+
+describe('GET /api/articles', ()=>{
+    test('should return status code 200', ()=>{
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+    })
+    test('should return an array of all articles in the articles table', ()=>{
+        return request(app)
+        .get('/api/articles').then(({body})=>{
+            expect(body.length).toBe(13)
+        })
+    })
+    test('articles should have all the correct properties', ()=>{
+        return request(app)
+        .get('/api/articles').then(({body})=>{
+            console.log(JSON.stringify(body))
+            body.forEach((article)=> {
+                expect(article).toEqual(
+                    expect.objectContaining({
+                        article_id: expect.any(Number),
+                        title: expect.any(String),
+                        topic: expect.any(String),
+                        author: expect.any(String),
+                        created_at: expect.any(String),
+                        comment_count: expect.any(Number),
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String)
+                      })
+                )
+            })
+        })
+      
+            
+    })
+    test('articles should be ordered by date in descending order', ()=>{
+        return request(app)
+        .get('/api/articles').then(({body})=>{
+            
+            expect(body).toBeSortedBy( 'created_at', {descending: true})
+        })
+      
+            
     })
 })
