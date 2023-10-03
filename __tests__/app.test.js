@@ -16,6 +16,9 @@ describe('GET /*', ()=>{
         return request(app)
         .get('/non-existing')
         .expect(404)
+        .then(({body})=>{
+            expect(body).toEqual({message: 'Path not found'})
+        })
     })
 })
 describe('GET /api/topics', ()=>{
@@ -41,15 +44,13 @@ describe('GET /api/topics', ()=>{
                 slug: 'paper'
               }
             topicsArr.forEach((topic)=> {
-                for (const key of Object.keys((exampleTopic))){
-                    expect(Object.hasOwn(topic, key))
-                }
+                expect(topic).toMatchObject({slug : expect.any(String), description: expect.any(String)})
             })
         })
     })
+})
     
 
-})
 describe('GET /api', ()=>{
     test('should return an object with all valid endpoints and their methods as properties',()=>{
         return request(app)
@@ -73,6 +74,7 @@ describe('GET /api', ()=>{
             expect(hasAllProperties).toBe(true)
         })
     })
+
 })
 
 describe('GET /api/articles/:article_id', ()=>{
@@ -109,3 +111,5 @@ describe('GET /api/articles/:article_id', ()=>{
         })
     })
 })
+
+
