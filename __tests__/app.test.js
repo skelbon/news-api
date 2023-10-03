@@ -74,3 +74,13 @@ describe('GET /api', ()=>{
         })
     })
 })
+
+describe('GET /api/articles/:article_id', ()=>{
+    test('sould return an article given the correct id or an empty array if no such id exists', ()=>{
+        return request(app)
+        .get('/api/articles/3').then((res)=>{
+            console.log(res.body)
+        })
+        
+    })
+})
