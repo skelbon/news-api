@@ -16,9 +16,12 @@ describe('GET /*', ()=>{
         return request(app)
         .get('/non-existing')
         .expect(404)
+<<<<<<< HEAD
         .then(({body})=>{
             expect(body).toEqual({message: 'Path not found'})
         })
+=======
+>>>>>>> 1_api/topics
     })
 })
 describe('GET /api/topics', ()=>{
@@ -48,6 +51,7 @@ describe('GET /api/topics', ()=>{
             })
         })
     })
+<<<<<<< HEAD
 })
     
 
@@ -74,4 +78,6 @@ describe('GET /api', ()=>{
             expect(hasAllProperties).toBe(true)
         })
     })
+=======
+>>>>>>> 1_api/topics
 })
