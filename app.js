@@ -1,4 +1,4 @@
-const {getTopics, getApiDescription} = require('./app.controller')
+const {getTopics, getApiDescription,getArticleById} = require('./app.controller')
 const express = require('express')
 const app = express()
 

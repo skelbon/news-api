@@ -10,6 +10,8 @@ exports.getTopics = (req, res, next)=>{
     })
 }
 
-exports.getApiDescription = (req,res, next)=>{
-    res.status(200).send(JSON.stringify(endpoints))
+exports.getApiDescription = (req, res, next)=>{
+    res.status(200).send(endpoints)
 }
+
+

@@ -3,6 +3,7 @@ const app = require('../app')
 const request = require('supertest')
 const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data')
+const endpoints = require('../endpoints.json')
 
 beforeEach(()=>{
     return seed(testData)
@@ -15,6 +16,9 @@ describe('GET /*', ()=>{
         return request(app)
         .get('/non-existing')
         .expect(404)
+        .then(({body})=>{
+            expect(body).toEqual({message: 'Path not found'})
+        })
     })
 })
 describe('GET /api/topics', ()=>{
@@ -40,10 +44,34 @@ describe('GET /api/topics', ()=>{
                 slug: 'paper'
               }
             topicsArr.forEach((topic)=> {
-                for (const key of Object.keys((exampleTopic))){
-                    expect(Object.hasOwn(topic, key))
-                }
+                expect(topic).toMatchObject({slug : expect.any(String), description: expect.any(String)})
             })
+        })
+    })
+})
+    
+
+describe('GET /api', ()=>{
+    test('should return an object with all valid endpoints and their methods as properties',()=>{
+        return request(app)
+        .get('/api')
+        .then(({body})=>{
+            const appRouteNames = []
+            app._router.stack.forEach((r)=>{
+                if(r.route && r.route.path){
+                    if(r.route.path !== '/*'){ //exclude invalid endpoints
+                        Object.keys(r.route.methods)
+                        .forEach((method) => {
+                            appRouteNames.push(`${method.toUpperCase()} ${r.route.path}`)
+                        })
+                    }
+                } 
+            })
+            let hasAllProperties = true
+            appRouteNames.forEach((route)=>{
+                if (!Object.keys(endpoints).includes(route)) hasAllProperties = false
+            })
+            expect(hasAllProperties).toBe(true)
         })
     })
 })
