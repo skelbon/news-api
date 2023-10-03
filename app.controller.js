@@ -1,4 +1,6 @@
-const {fetchTopics} = require('./app.model')
+
+const {fetchTopics, fetchArticleById} = require('./app.model')
+
 const endpoints = require('./endpoints.json')
 
 exports.getTopics = (req, res, next)=>{
@@ -14,4 +16,9 @@ exports.getApiDescription = (req, res, next)=>{
     res.status(200).send(endpoints)
 }
 
+exports.getArticleById = (req, res, next)=>{
+    fetchArticleById(req.params.article_id).then((article)=>{
+        res.status(200).send(article)
+    }).catch( err => res.status(400).send(err))
+}
 

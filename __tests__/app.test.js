@@ -74,4 +74,42 @@ describe('GET /api', ()=>{
             expect(hasAllProperties).toBe(true)
         })
     })
+
 })
+
+describe('GET /api/articles/:article_id', ()=>{
+    test('sould return an article given the correct id or an empty array if no such id exists', ()=>{
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String)
+              })
+        })
+    })
+    test('sould return an error status 400 with appropriate message if the id is invalid', ()=>{
+        return request(app)
+        .get('/api/articles/invalid_id')
+        .expect(400)
+        .then(({body})=>{
+           expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' }) 
+        })
+    })
+
+    test('should return an error status 400 with appropriate message if the id does not exist', ()=>{
+        return request(app)
+        .get('/api/articles/9999')
+        .expect(400)
+        .then(({body})=>{
+            expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
+        })
+    })
+})
+
+
