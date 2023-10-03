@@ -127,7 +127,6 @@ describe('GET /api/articles', ()=>{
     test('articles should have all the correct properties', ()=>{
         return request(app)
         .get('/api/articles').then(({body})=>{
-            console.log(JSON.stringify(body))
             body.forEach((article)=> {
                 expect(article).toEqual(
                     expect.objectContaining({
@@ -143,16 +142,11 @@ describe('GET /api/articles', ()=>{
                 )
             })
         })
-      
-            
     })
     test('articles should be ordered by date in descending order', ()=>{
         return request(app)
         .get('/api/articles').then(({body})=>{
-            
             expect(body).toBeSortedBy( 'created_at', {descending: true})
         })
-      
-            
     })
 })
