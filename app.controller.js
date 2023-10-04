@@ -47,7 +47,6 @@ exports.postArticleComments = (req, res, next)=>{
 }
 
 exports.patchArticleVotes = (req, res, next)=>{
-    console.log('arrived', req.body.inc_votes)
     updateArticleVotes(req.body.inc_votes, req.params.article_id).then((article)=>{
         res.status(200).send(article)
     }).catch( err => next(err))

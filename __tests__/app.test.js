@@ -271,7 +271,7 @@ describe('POST /api/articles/:article_id/comments', ()=>{
         .send(newComment)
     })
 })
-describe.only('PATCH /api/articles/:article_id', ()=>{
+describe('PATCH /api/articles/:article_id', ()=>{
     test('retruns status code 200 when given a valid and existing article_id and a valid vote object', ()=>{
         const vote = { inc_votes : 1}
         return request(app)
@@ -279,24 +279,67 @@ describe.only('PATCH /api/articles/:article_id', ()=>{
         .send(vote)
         .expect(200)
     })
-    test.only('should return the article with the vote field appropriately updated', ()=>{
-        const vote = { inc_votes : 1}
+
+    test('should return the article with the vote field appropriately updated when passed a positive inc_vote value', ()=>{
+        const vote = { inc_votes : 50}
         let originalVoteCount
         return request(app)
         .get('/api/articles/3').then(({body})=>{
-            console.log(body)
             originalVoteCount = body.votes
-            console.log(originalVoteCount)
         }).then(()=>{
             return request(app)
             .patch('/api/articles/3')
             .send(vote).then(({body})=>{
-                console.log(body)
                 expect(body.votes).toEqual(originalVoteCount + vote.inc_votes)
             })
         })
-        
-        
+    })
+
+    test('should return the article with the vote field appropriately updated when passed a negative inc_vote value', ()=>{
+        const vote = { inc_votes : -100}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            originalVoteCount = body.votes
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(vote).then(({body})=>{
+                expect(body.votes).toEqual(originalVoteCount + vote.inc_votes)
+            })
+        })
+    })
+
+    test('should return a 400 status code if passed an object of the wrong format/invalid object', ()=>{
+        const malformedVote= { in_vote : 1}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            originalVoteCount = body.votes
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(malformedVote)
+            .expect(400)
+        })
+    })
+    
+    test('should return a 404 not found status code if passed the id of an article that does not exist', ()=>{
+        const vote = { inc_votes : 1}
+        let originalVoteCount
+        return request(app)
+        .patch('/api/articles/999')
+        .send(vote)
+        .expect(404)
+    })
+    
+    test('should return a 400 bad request status code if passed an invalid article_id', ()=>{
+        const vote = { inc_votes : 1}
+        let originalVoteCount
+        return request(app)
+        .patch('/api/articles/invalid_id')
+        .send(vote)
+        .expect(400)
     })
 })
 
