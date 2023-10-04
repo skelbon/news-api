@@ -156,7 +156,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
         .get('/api/articles/3/comments')
         .expect(200)
     })
-    test('sould return an error status 400 with appropriate message if the id is invalid', ()=>{
+    test('should return an error status 400 with appropriate message if the id is invalid', ()=>{
         return request(app)
         .get('/api/articles/invalid_id/comments')
         .expect(400)
@@ -167,10 +167,9 @@ describe('GET /api/articles/:article_id/comments', ()=>{
     test('should return a 200 status code with an empty array if the article_id is valid but does not exist',()=>{
         return request(app)
         .get('/api/articles/999/comments')
-        .expect(200)
+        .expect(404)
         .then(({body})=>{
-            console.log(body)
-            expect(body).toEqual([])
+            expect(body).toEqual({ message: 'Not found' })
         })
     })
     test('should return a 200 status code with an empty array if the article_id is valid exists and there are no comments',()=>{
@@ -178,8 +177,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
         .get('/api/articles/2/comments')
         .expect(200)
         .then(({body})=>{
-            console.log(body)
-            expect(body).toEqual([])
+            expect(body.comments).toEqual([])
         })
     })
     test('should return all the comments for a given article in descending date order', ()=>{
@@ -187,7 +185,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
         .get('/api/articles/3/comments')
         .expect(200)
         .then(({body})=>{
-            expect(body).toEqual(
+            expect(body.comments).toEqual(
                 [
                     {
                       "article_id": 3,
@@ -207,7 +205,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
                     }
                 ]
             )
-            expect(body).toBeSortedBy('created_at',{descending : true})
+            expect(body.comments).toBeSortedBy('created_at',{descending : true})
 
         })
     })

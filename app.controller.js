@@ -29,6 +29,6 @@ exports.getAllArticles = (req, res, next)=>{
 
 exports.getAllArticleComments = (req, res, next)=>{
     fetchAllArticleComments(req.params.article_id).then((comments)=>{
-        res.status(200).send(comments)
+        res.status(200).send({comments})
     }).catch( err => next(err))
 }
