@@ -1,6 +1,5 @@
 const db = require('./db/connection')
 
-
 exports.fetchTopics = ()=>{
     return db.query(`SELECT * FROM topics;`).then(({rows})=>{
         return rows
@@ -14,6 +13,7 @@ exports.fetchArticleById = (article_id)=>{
         return Promise.reject({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
     })
 }
+
 
 exports.fetchAllArticles = ()=>{
     return db.query(`SELECT CAST(COUNT(comments) AS INT) AS 
