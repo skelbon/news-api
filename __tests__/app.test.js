@@ -98,7 +98,7 @@ describe('GET /api/articles/:article_id', ()=>{
         .get('/api/articles/invalid_id')
         .expect(400)
         .then(({body})=>{
-           expect(body).toEqual({message: 'Bad request - invalid input syntax - integer expected'}) 
+           expect(body).toEqual({message: 'Bad request'}) 
         })
     })
 
@@ -161,7 +161,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
         .get('/api/articles/invalid_id/comments')
         .expect(400)
         .then(({body})=>{
-           expect(body).toEqual({message: 'Bad request - invalid input syntax - integer expected'}) 
+           expect(body).toEqual({message: 'Bad request'}) 
         })
     })
     test('should return a 200 status code with an empty array if the article_id is valid but does not exist',()=>{
@@ -208,6 +208,95 @@ describe('GET /api/articles/:article_id/comments', ()=>{
             expect(body.comments).toBeSortedBy('created_at',{descending : true})
 
         })
+    })
+})
+describe('POST /api/articles/:article_id/comments', ()=>{
+    test('returns a status code 200 when passed a correctly formatted article object to an existing article', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .expect(200)
+    })
+    test('should return the posted comment when successful', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .then(({body})=>{
+            expect(body).toEqual(
+                {
+                  "article_id": 3,
+                  "author": "butter_bridge",
+                  "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                  "comment_id": expect.any(Number),
+                  "created_at": expect.any(String),
+                  "votes": 0
+                }
+              )
+        })
+    })
+    test('should return status code 404 when passed a valid but non existing article_id', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/999/comments')
+        .send(newComment)
+        .expect(404)
+    })
+    test('should return status code 400 when passed a malformed comment object', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            usernme: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+    })
+    test('should return status code 404 when passed a comment from an unregistered user', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_b#idge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+    })
+})
+describe.only('PATCH /api/articles/:article_id', ()=>{
+    test('retruns status code 200 when given a valid and existing article_id and a valid vote object', ()=>{
+        const vote = { inc_votes : 1}
+        return request(app)
+        .patch('/api/articles/3')
+        .send(vote)
+        .expect(200)
+    })
+    test.only('should return the article with the vote field appropriately updated', ()=>{
+        const vote = { inc_votes : 1}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            console.log(body)
+            originalVoteCount = body.votes
+            console.log(originalVoteCount)
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(vote).then(({body})=>{
+                console.log(body)
+                expect(body.votes).toEqual(originalVoteCount + vote.inc_votes)
+            })
+        })
+        
+        
     })
 })
 

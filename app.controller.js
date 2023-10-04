@@ -1,4 +1,11 @@
-const {fetchAllArticleComments, fetchTopics, fetchArticleById,fetchAllArticles} = require('./app.model')
+const {
+    fetchAllArticleComments, 
+    fetchTopics, 
+    fetchArticleById,
+    fetchAllArticles, 
+    insertComments,
+    updateArticleVotes
+ } = require('./app.model')
 
 const endpoints = require('./endpoints.json')
 
@@ -30,5 +37,18 @@ exports.getAllArticles = (req, res, next)=>{
 exports.getAllArticleComments = (req, res, next)=>{
     fetchAllArticleComments(req.params.article_id).then((comments)=>{
         res.status(200).send({comments})
+    }).catch( err => next(err))
+}
+
+exports.postArticleComments = (req, res, next)=>{
+    insertComments(req.body,req.params.article_id).then((comment)=>{
+        res.status(200).send(comment)
+    }).catch( err => next(err))
+}
+
+exports.patchArticleVotes = (req, res, next)=>{
+    console.log('arrived', req.body.inc_votes)
+    updateArticleVotes(req.body.inc_votes, req.params.article_id).then((article)=>{
+        res.status(200).send(article)
     }).catch( err => next(err))
 }
