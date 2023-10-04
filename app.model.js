@@ -8,12 +8,9 @@ exports.fetchTopics = ()=>{
 
 exports.fetchArticleById = (article_id)=>{
     return db.query(`SELECT * FROM articles WHERE article_id=$1`, [article_id]).then(({rows})=>{
-        return rows[0] ?? Promise.reject() 
-    }).catch((err)=>{
-        return Promise.reject({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
+        return rows[0] ?? Promise.reject(404)
     })
 }
-
 
 exports.fetchAllArticles = ()=>{
     return db.query(`SELECT CAST(COUNT(comments) AS INT) AS 
@@ -26,5 +23,12 @@ exports.fetchAllArticles = ()=>{
     .then(({rows})=>{
         return rows
     })
-    .catch((err)=>{return err})
+}
+
+exports.fetchAllArticleComments = (article_id)=>{
+    
+    return db.query(`SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC`, [article_id])
+    .then(({rows})=>{
+        return rows 
+    })
 }

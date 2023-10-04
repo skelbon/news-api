@@ -1,5 +1,4 @@
-
-const {fetchTopics, fetchArticleById,fetchAllArticles} = require('./app.model')
+const {fetchAllArticleComments, fetchTopics, fetchArticleById,fetchAllArticles} = require('./app.model')
 
 const endpoints = require('./endpoints.json')
 
@@ -19,7 +18,7 @@ exports.getApiDescription = (req, res, next)=>{
 exports.getArticleById = (req, res, next)=>{
     fetchArticleById(req.params.article_id).then((article)=>{
         res.status(200).send(article)
-    }).catch( err => res.status(400).send(err))
+    }).catch( err => next(err))
 }
 
 exports.getAllArticles = (req, res, next)=>{
@@ -28,3 +27,8 @@ exports.getAllArticles = (req, res, next)=>{
     })
 }
 
+exports.getAllArticleComments = (req, res, next)=>{
+    fetchAllArticleComments(req.params.article_id).then((comments)=>{
+        res.status(200).send(comments)
+    }).catch( err => next(err))
+}

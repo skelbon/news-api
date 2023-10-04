@@ -98,16 +98,16 @@ describe('GET /api/articles/:article_id', ()=>{
         .get('/api/articles/invalid_id')
         .expect(400)
         .then(({body})=>{
-           expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' }) 
+           expect(body).toEqual({message: 'Bad request - invalid input syntax - integer expected'}) 
         })
     })
 
     test('should return an error status 400 with appropriate message if the id does not exist', ()=>{
         return request(app)
         .get('/api/articles/9999')
-        .expect(400)
+        .expect(404)
         .then(({body})=>{
-            expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
+            expect(body).toEqual({ message: 'Not found' })
         })
     })
 })
@@ -147,6 +147,68 @@ describe('GET /api/articles', ()=>{
         return request(app)
         .get('/api/articles').then(({body})=>{
             expect(body).toBeSortedBy( 'created_at', {descending: true})
+        })
+    })
+})
+describe('GET /api/articles/:article_id/comments', ()=>{
+    test('should return a 200 status code', ()=>{
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+    })
+    test('sould return an error status 400 with appropriate message if the id is invalid', ()=>{
+        return request(app)
+        .get('/api/articles/invalid_id/comments')
+        .expect(400)
+        .then(({body})=>{
+           expect(body).toEqual({message: 'Bad request - invalid input syntax - integer expected'}) 
+        })
+    })
+    test('should return a 200 status code with an empty array if the article_id is valid but does not exist',()=>{
+        return request(app)
+        .get('/api/articles/999/comments')
+        .expect(200)
+        .then(({body})=>{
+            console.log(body)
+            expect(body).toEqual([])
+        })
+    })
+    test('should return a 200 status code with an empty array if the article_id is valid exists and there are no comments',()=>{
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({body})=>{
+            console.log(body)
+            expect(body).toEqual([])
+        })
+    })
+    test('should return all the comments for a given article in descending date order', ()=>{
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+        .then(({body})=>{
+            expect(body).toEqual(
+                [
+                    {
+                      "article_id": 3,
+                      "author": "icellusedkars",
+                      "body": "Ambidextrous marsupial",
+                      "comment_id": 11,
+                      "created_at": "2020-09-19T23:10:00.000Z",
+                      "votes": 0
+                    },
+                    {
+                      "article_id": 3,
+                      "author": "icellusedkars",
+                      "body": "git push origin master",
+                      "comment_id": 10,
+                      "created_at": "2020-06-20T07:24:00.000Z",
+                      "votes": 0
+                    }
+                ]
+            )
+            expect(body).toBeSortedBy('created_at',{descending : true})
+
         })
     })
 })
