@@ -4,7 +4,8 @@ const {
     fetchArticleById,
     fetchAllArticles, 
     insertComments,
-    updateArticleVotes
+    updateArticleVotes,
+    removeCommentById
  } = require('./app.model')
 
 const endpoints = require('./endpoints.json')
@@ -50,4 +51,10 @@ exports.patchArticleVotes = (req, res, next)=>{
     updateArticleVotes(req.body.inc_votes, req.params.article_id).then((article)=>{
         res.status(200).send(article)
     }).catch( err => next(err))
+}
+
+exports.deleteCommentById = (req,res, next)=>{
+    removeCommentById(req.params.comment_id).then(()=>{
+        res.status(204).send()
+    }).catch( err=> next(err))
 }

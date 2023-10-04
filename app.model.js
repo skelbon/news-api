@@ -53,3 +53,11 @@ exports.updateArticleVotes = (newVote, article_id)=>{
                         return rows[0] ?? Promise.reject(404)
                     })
 }
+
+exports.removeCommentById = (comment_id)=>{
+    return db.query(`DELETE FROM comments WHERE comment_id=$1`,[comment_id]).then(({rowCount})=>{
+        return rowCount===0 ? Promise.reject(404) : Promise.resolve()
+    })
+    
+}
+

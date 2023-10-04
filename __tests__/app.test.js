@@ -341,5 +341,23 @@ describe('PATCH /api/articles/:article_id', ()=>{
         .send(vote)
         .expect(400)
     })
+
+    describe('DELETE /api/comments/:comment_id', ()=>{
+        test('should respond with a status code 204 given a valid and existent comment_id',()=>{
+            return request(app)
+            .delete('/api/comments/3')
+            .expect(204)
+        })
+        test('should respond with a status code 400 if passed a non intger comment_id ',()=>{
+            return request(app)
+            .delete('/api/comments/bad_id')
+            .expect(400)
+        })
+        test('should respond with a status code 404 if passed a non existent comment_id ',()=>{
+            return request(app)
+            .delete('/api/comments/33333')
+            .expect(404)
+        })
+    })
 })
 

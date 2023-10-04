@@ -6,7 +6,8 @@ const {
     getArticleById, 
     getAllArticles, 
     postArticleComments,
-    patchArticleVotes
+    patchArticleVotes,
+    deleteCommentById
 } = require('./app.controller')
 
 const express = require('express')
@@ -27,6 +28,8 @@ app.get('/api/articles/:article_id/comments', getAllArticleComments)
 app.post('/api/articles/:article_id/comments', postArticleComments)
 
 app.patch('/api/articles/:article_id', patchArticleVotes)
+
+app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.all('/*', (req, res, next)=>{
     res.status(404).send({message: 'Path not found'})
