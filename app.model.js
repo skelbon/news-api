@@ -12,14 +12,23 @@ exports.fetchArticleById = (article_id)=>{
     })
 }
 
-exports.fetchAllArticles = ()=>{
-    return db.query(`SELECT CAST(COUNT(comments) AS INT) AS 
-                    comment_count, articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
-                    LEFT JOIN comments 
-                    ON articles.article_id = comments.article_id  
-                    GROUP BY articles.article_id 
-                    ORDER BY articles.created_at DESC;`
-                    )
+exports.fetchAllArticles = (topic)=>{
+
+    const queryArr= []
+    let queryStr = `SELECT CAST(COUNT(comments) AS INT) AS 
+    comment_count, articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
+    LEFT JOIN comments 
+    ON articles.article_id = comments.article_id `
+
+    if(topic) {
+        queryStr += `WHERE topic= $1 ` 
+        queryArr.push(topic)
+    }
+
+    queryStr += `GROUP BY articles.article_id 
+                 ORDER BY articles.created_at DESC;`
+    
+    return db.query(queryStr, queryArr)
     .then(({rows})=>{
         return rows
     })

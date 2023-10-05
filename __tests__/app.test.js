@@ -148,6 +148,20 @@ describe('GET /api/articles', ()=>{
             expect(body).toBeSortedBy( 'created_at', {descending: true})
         })
     })
+    test('should return articles filtered by topic if topic is included in query', ()=>{
+        return request(app)
+        .get('/api/articles?topic=mitch').then(({body})=>{
+            body.forEach((article)=>{
+                expect(article.topic).toBe('mitch')
+            })
+        })
+    })
+    test('should return no articles i filtered by topic if no article with that topic exists', ()=>{
+        return request(app)
+        .get('/api/articles?topic=no_topic').then(({body})=>{
+            expect(body.length).toBe(0)
+        })
+    })
 })
 
 describe('GET /api/articles/:article_id/comments', ()=>{
@@ -397,7 +411,5 @@ describe('GET /api/users', ()=>{
         })
     })
 })
-
-
 
 

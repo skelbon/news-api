@@ -27,8 +27,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": [],
+    "description": "serves an array of all articles filters by topic if tpic is included in query",
+    "queries": "topic",
     "exampleResponse": {
       "articles": [
         {
