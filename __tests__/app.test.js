@@ -51,7 +51,6 @@ describe('GET /api/topics', ()=>{
     })
 })
     
-
 describe('GET /api', ()=>{
     test('should return an object with all valid endpoints and their methods as properties',()=>{
         return request(app)
@@ -150,6 +149,7 @@ describe('GET /api/articles', ()=>{
         })
     })
 })
+
 describe('GET /api/articles/:article_id/comments', ()=>{
     test('should return a 200 status code', ()=>{
         return request(app)
@@ -210,6 +210,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
         })
     })
 })
+
 describe('POST /api/articles/:article_id/comments', ()=>{
     test('returns a status code 200 when passed a correctly formatted article object to an existing article', ()=>{
         const newComment = {
@@ -271,6 +272,7 @@ describe('POST /api/articles/:article_id/comments', ()=>{
         .send(newComment)
     })
 })
+
 describe('PATCH /api/articles/:article_id', ()=>{
     test('retruns status code 200 when given a valid and existing article_id and a valid vote object', ()=>{
         const vote = { inc_votes : 1}
@@ -341,23 +343,26 @@ describe('PATCH /api/articles/:article_id', ()=>{
         .send(vote)
         .expect(400)
     })
+})
 
-    describe('DELETE /api/comments/:comment_id', ()=>{
-        test('should respond with a status code 204 given a valid and existent comment_id',()=>{
-            return request(app)
-            .delete('/api/comments/3')
-            .expect(204)
-        })
-        test('should respond with a status code 400 if passed a non intger comment_id ',()=>{
-            return request(app)
-            .delete('/api/comments/bad_id')
-            .expect(400)
-        })
-        test('should respond with a status code 404 if passed a non existent comment_id ',()=>{
-            return request(app)
-            .delete('/api/comments/33333')
-            .expect(404)
-        })
+describe('DELETE /api/comments/:comment_id', ()=>{
+    test('should respond with a status code 204 given a valid and existent comment_id',()=>{
+        return request(app)
+        .delete('/api/comments/3')
+        .expect(204)
+    })
+    test('should respond with a status code 400 if passed a non intger comment_id ',()=>{
+        return request(app)
+        .delete('/api/comments/bad_id')
+        .expect(400)
+    })
+    test('should respond with a status code 404 if passed a non existent comment_id ',()=>{
+        return request(app)
+        .delete('/api/comments/33333')
+        .expect(404)
     })
 })
+
+
+
 
