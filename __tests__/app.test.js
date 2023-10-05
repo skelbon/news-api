@@ -412,4 +412,20 @@ describe('GET /api/users', ()=>{
     })
 })
 
-
+describe.only('commment_count FEATURE ADDED GET /api/articles/:article_id', ()=>{
+    test('sould return an article with a comment_count property reflecting the number of comments the article has recieved', ()=>{
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            expect(body).toEqual({
+                comment_count: 2,
+                article_id: 3,
+                title: 'Eight pug gifs that remind me of mitch',
+                topic: 'mitch',
+                author: 'icellusedkars',
+                created_at: '2020-11-03T09:12:00.000Z',
+                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                votes: 0
+              })
+        })
+    })
+})
