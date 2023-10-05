@@ -51,7 +51,6 @@ describe('GET /api/topics', ()=>{
     })
 })
     
-
 describe('GET /api', ()=>{
     test('should return an object with all valid endpoints and their methods as properties',()=>{
         return request(app)
@@ -98,16 +97,16 @@ describe('GET /api/articles/:article_id', ()=>{
         .get('/api/articles/invalid_id')
         .expect(400)
         .then(({body})=>{
-           expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' }) 
+           expect(body).toEqual({message: 'Bad request'}) 
         })
     })
 
     test('should return an error status 400 with appropriate message if the id does not exist', ()=>{
         return request(app)
         .get('/api/articles/9999')
-        .expect(400)
+        .expect(404)
         .then(({body})=>{
-            expect(body).toEqual({ message: 'Invalid article_id - the article does not exist or your article_id is malformed' })
+            expect(body).toEqual({ message: 'Not found' })
         })
     })
 })
@@ -150,4 +149,220 @@ describe('GET /api/articles', ()=>{
         })
     })
 })
+
+describe('GET /api/articles/:article_id/comments', ()=>{
+    test('should return a 200 status code', ()=>{
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+    })
+    test('should return an error status 400 with appropriate message if the id is invalid', ()=>{
+        return request(app)
+        .get('/api/articles/invalid_id/comments')
+        .expect(400)
+        .then(({body})=>{
+           expect(body).toEqual({message: 'Bad request'}) 
+        })
+    })
+    test('should return a 200 status code with an empty array if the article_id is valid but does not exist',()=>{
+        return request(app)
+        .get('/api/articles/999/comments')
+        .expect(404)
+        .then(({body})=>{
+            expect(body).toEqual({ message: 'Not found' })
+        })
+    })
+    test('should return a 200 status code with an empty array if the article_id is valid exists and there are no comments',()=>{
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({body})=>{
+            expect(body.comments).toEqual([])
+        })
+    })
+    test('should return all the comments for a given article in descending date order', ()=>{
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+        .then(({body})=>{
+            expect(body.comments).toEqual(
+                [
+                    {
+                      "article_id": 3,
+                      "author": "icellusedkars",
+                      "body": "Ambidextrous marsupial",
+                      "comment_id": 11,
+                      "created_at": "2020-09-19T23:10:00.000Z",
+                      "votes": 0
+                    },
+                    {
+                      "article_id": 3,
+                      "author": "icellusedkars",
+                      "body": "git push origin master",
+                      "comment_id": 10,
+                      "created_at": "2020-06-20T07:24:00.000Z",
+                      "votes": 0
+                    }
+                ]
+            )
+            expect(body.comments).toBeSortedBy('created_at',{descending : true})
+
+        })
+    })
+})
+
+describe('POST /api/articles/:article_id/comments', ()=>{
+    test('returns a status code 200 when passed a correctly formatted article object to an existing article', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .expect(200)
+    })
+    test('should return the posted comment when successful', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .then(({body})=>{
+            expect(body).toEqual(
+                {
+                  "article_id": 3,
+                  "author": "butter_bridge",
+                  "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                  "comment_id": expect.any(Number),
+                  "created_at": expect.any(String),
+                  "votes": 0
+                }
+              )
+        })
+    })
+    test('should return status code 404 when passed a valid but non existing article_id', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/999/comments')
+        .send(newComment)
+        .expect(404)
+    })
+    test('should return status code 400 when passed a malformed comment object', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            usernme: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+    })
+    test('should return status code 404 when passed a comment from an unregistered user', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_b#idge",
+          }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+    })
+})
+
+describe('PATCH /api/articles/:article_id', ()=>{
+    test('retruns status code 200 when given a valid and existing article_id and a valid vote object', ()=>{
+        const vote = { inc_votes : 1}
+        return request(app)
+        .patch('/api/articles/3')
+        .send(vote)
+        .expect(200)
+    })
+
+    test('should return the article with the vote field appropriately updated when passed a positive inc_vote value', ()=>{
+        const vote = { inc_votes : 50}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            originalVoteCount = body.votes
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(vote).then(({body})=>{
+                expect(body.votes).toEqual(originalVoteCount + vote.inc_votes)
+            })
+        })
+    })
+
+    test('should return the article with the vote field appropriately updated when passed a negative inc_vote value', ()=>{
+        const vote = { inc_votes : -100}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            originalVoteCount = body.votes
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(vote).then(({body})=>{
+                expect(body.votes).toEqual(originalVoteCount + vote.inc_votes)
+            })
+        })
+    })
+
+    test('should return a 400 status code if passed an object of the wrong format/invalid object', ()=>{
+        const malformedVote= { in_vote : 1}
+        let originalVoteCount
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            originalVoteCount = body.votes
+        }).then(()=>{
+            return request(app)
+            .patch('/api/articles/3')
+            .send(malformedVote)
+            .expect(400)
+        })
+    })
+    
+    test('should return a 404 not found status code if passed the id of an article that does not exist', ()=>{
+        const vote = { inc_votes : 1}
+        let originalVoteCount
+        return request(app)
+        .patch('/api/articles/999')
+        .send(vote)
+        .expect(404)
+    })
+    
+    test('should return a 400 bad request status code if passed an invalid article_id', ()=>{
+        const vote = { inc_votes : 1}
+        let originalVoteCount
+        return request(app)
+        .patch('/api/articles/invalid_id')
+        .send(vote)
+        .expect(400)
+    })
+})
+
+describe('DELETE /api/comments/:comment_id', ()=>{
+    test('should respond with a status code 204 given a valid and existent comment_id',()=>{
+        return request(app)
+        .delete('/api/comments/3')
+        .expect(204)
+    })
+    test('should respond with a status code 400 if passed a non intger comment_id ',()=>{
+        return request(app)
+        .delete('/api/comments/bad_id')
+        .expect(400)
+    })
+    test('should respond with a status code 404 if passed a non existent comment_id ',()=>{
+        return request(app)
+        .delete('/api/comments/33333')
+        .expect(404)
+    })
+})
+
+
+
 
