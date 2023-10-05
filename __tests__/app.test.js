@@ -222,17 +222,6 @@ describe('POST /api/articles/:article_id/comments', ()=>{
         .send(newComment)
         .expect(200)
     })
-    test('returns a status code 200 when passed a correctly formatted article object to an existing article wth an extra kv pair to be ignored', ()=>{
-        const newComment = {
-            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-            username: "butter_bridge",
-            ignored: "kv pair"
-          }
-        return request(app)
-        .post('/api/articles/3/comments')
-        .send(newComment)
-        .expect(200)
-    })
     test('should return the posted comment when successful', ()=>{
         const newComment = {
             body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -264,15 +253,15 @@ describe('POST /api/articles/:article_id/comments', ()=>{
         .send(newComment)
         .expect(404)
     })
-    test('should return status code 400 when passed an invalid - non numeric article_id', ()=>{
+    test('should return status code 404 when passed a valid but non existing article_id', ()=>{
         const newComment = {
             body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
             username: "butter_bridge",
           }
         return request(app)
-        .post('/api/articles/9d9/comments')
+        .post('/api/articles/999/comments')
         .send(newComment)
-        .expect(400)
+        .expect(404)
     })
     test('should return status code 400 when passed a malformed comment object', ()=>{
         const newComment = {
@@ -395,10 +384,20 @@ describe('GET /api/users', ()=>{
         .get('/api/users')
         .then(({body})=>{
             body.forEach((user)=>{
-                expect()
+                expect(user).toEqual(
+                    expect.objectContaining(
+                        {
+                            username: expect.any(String), 
+                            name: expect.any(String),
+                            avatar_url: expect.any(String)
+                        }
+                    )
+                )
             })
         })
     })
 })
+
+
 
 

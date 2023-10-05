@@ -39,7 +39,6 @@ app.all('/*', (req, res, next)=>{
 })
 
 app.use((err, req, res, next)=>{
-    console.log(err)
     if(err.code === '22P02' || err.code === '23502')
         res.status(400).send({message: 'Bad request'})
     if(err === 404 || err.code === '23503')
