@@ -164,7 +164,7 @@ describe('GET /api/articles/:article_id/comments', ()=>{
            expect(body).toEqual({message: 'Bad request'}) 
         })
     })
-    test('should return a 200 status code with an empty array if the article_id is valid but does not exist',()=>{
+    test('should return a 404 status code with an empty array if the article_id is valid but does not exist',()=>{
         return request(app)
         .get('/api/articles/999/comments')
         .expect(404)
@@ -242,6 +242,16 @@ describe('POST /api/articles/:article_id/comments', ()=>{
                 }
               )
         })
+    })
+    test('should return status code 404 when passed a valid but non existing article_id', ()=>{
+        const newComment = {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            username: "butter_bridge",
+          }
+        return request(app)
+        .post('/api/articles/999/comments')
+        .send(newComment)
+        .expect(404)
     })
     test('should return status code 404 when passed a valid but non existing article_id', ()=>{
         const newComment = {
@@ -360,6 +370,31 @@ describe('DELETE /api/comments/:comment_id', ()=>{
         return request(app)
         .delete('/api/comments/33333')
         .expect(404)
+    })
+})
+
+describe('GET /api/users', ()=>{
+    test('should respond with status code 200', ()=>{
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+    })
+    test('should return an array of objects with username, name & avater props', ()=>{
+        return request(app)
+        .get('/api/users')
+        .then(({body})=>{
+            body.forEach((user)=>{
+                expect(user).toEqual(
+                    expect.objectContaining(
+                        {
+                            username: expect.any(String), 
+                            name: expect.any(String),
+                            avatar_url: expect.any(String)
+                        }
+                    )
+                )
+            })
+        })
     })
 })
 

@@ -5,7 +5,8 @@ const {
     fetchAllArticles, 
     insertComments,
     updateArticleVotes,
-    removeCommentById
+    removeCommentById,
+    fetchAllUsers
  } = require('./app.model')
 
 const endpoints = require('./endpoints.json')
@@ -57,4 +58,9 @@ exports.deleteCommentById = (req,res, next)=>{
     removeCommentById(req.params.comment_id).then(()=>{
         res.status(204).send()
     }).catch( err=> next(err))
+}
+exports.getAllUsers = (req,res,next)=>{
+    fetchAllUsers().then((users)=>{
+        res.status(200).send(users)
+    })
 }
