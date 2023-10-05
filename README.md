@@ -52,7 +52,9 @@ You will also need to 'npm install dotenv' to utilise these files.
 
 ## Seeding
 
-To seed your database run 'npm run seed-dbs'. 
+First setup your databases with 'npm run setup-dbs'
+
+To seed your database run 'npm run seed'. 
 
 ## Testing
 
