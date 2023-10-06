@@ -31,9 +31,9 @@ exports.getArticleById = (req, res, next)=>{
 }
 
 exports.getAllArticles = (req, res, next)=>{
-    fetchAllArticles(req.query.topic).then((articles)=>{
+    fetchAllArticles(req.query.topic, req.query.sort_by, req.query.order).then((articles)=>{
         res.status(200).send(articles)
-    })
+    }).catch( err => next(err))
 }
 
 exports.getAllArticleComments = (req, res, next)=>{

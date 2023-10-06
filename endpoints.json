@@ -27,8 +27,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles filters by topic if tpic is included in query",
-    "queries": "topic",
+    "description": "serves an array of all articles filters by topic if topic is included in query,sorted by sort_by in either asc or desc order",
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {

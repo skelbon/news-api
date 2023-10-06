@@ -1,11 +1,12 @@
 const db = require('./db/connection')
+const format = require('pg-format')
 
 exports.fetchTopics = ()=>{
     return db.query(`SELECT * FROM topics;`).then(({rows})=>{
         return rows
     })
 }
-
+ 
 exports.fetchArticleById = (article_id)=>{
     return db.query(`SELECT CAST(COUNT(comments) AS INT) AS comment_count,articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
     LEFT JOIN comments
@@ -16,23 +17,39 @@ exports.fetchArticleById = (article_id)=>{
     })
 }
 
-exports.fetchAllArticles = (topic)=>{
+exports.fetchAllArticles = (topic, sort_by='created_at', order='DESC')=>{
 
+    const validSortBys = [
+        'created_at', 
+        'title',
+        'author', 
+        'aritcle_id', 
+        'topic', 
+        'votes',
+        'comment_count'
+    ]
+
+    if (!validSortBys.includes(sort_by)) return Promise.reject(400)
     const queryArr= []
+
+    
+    
     let queryStr = `SELECT CAST(COUNT(comments) AS INT) AS 
     comment_count, articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
     LEFT JOIN comments 
     ON articles.article_id = comments.article_id `
-
+    
     if(topic) {
-        queryStr += `WHERE topic= $1 ` 
+        queryStr += `WHERE topic= %L ` 
         queryArr.push(topic)
     }
-
-    queryStr += `GROUP BY articles.article_id 
-                 ORDER BY articles.created_at DESC;`
     
-    return db.query(queryStr, queryArr)
+    queryArr.push(sort_by)
+    queryArr.push(order) 
+    
+    queryStr += `GROUP BY articles.article_id 
+                 ORDER BY articles.%I %s;`
+    return db.query(format(queryStr, ...queryArr))
     .then(({rows})=>{
         return rows
     })

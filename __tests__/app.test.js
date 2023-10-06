@@ -109,6 +109,21 @@ describe('GET /api/articles/:article_id', ()=>{
             expect(body).toEqual({ message: 'Not found' })
         })
     })
+    test('sould return an article with a comment_count property reflecting the number of comments the article has recieved', ()=>{
+        return request(app)
+        .get('/api/articles/3').then(({body})=>{
+            expect(body).toEqual({
+                comment_count: 2,
+                article_id: 3,
+                title: 'Eight pug gifs that remind me of mitch',
+                topic: 'mitch',
+                author: 'icellusedkars',
+                created_at: '2020-11-03T09:12:00.000Z',
+                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                votes: 0
+              })
+        })
+    })
 })
 
 describe('GET /api/articles', ()=>{
@@ -151,15 +166,33 @@ describe('GET /api/articles', ()=>{
     test('should return articles filtered by topic if topic is included in query', ()=>{
         return request(app)
         .get('/api/articles?topic=mitch').then(({body})=>{
+            expect(body.length).toBe(12)
             body.forEach((article)=>{
                 expect(article.topic).toBe('mitch')
             })
         })
     })
-    test('should return no articles i filtered by topic if no article with that topic exists', ()=>{
+    test('should return no articles if filtered by topic if no article with that topic exists', ()=>{
         return request(app)
         .get('/api/articles?topic=no_topic').then(({body})=>{
             expect(body.length).toBe(0)
+        })
+    })
+    test('should respond with articles sorted by whichever field is given in the sort_by query descending by default', ()=>{
+        return request(app)
+        .get('/api/articles?sort_by=title').then(({body})=>{
+            expect(body).toBeSortedBy('title',{descending : true})
+        })
+    })
+    test('should respond with status 400 when passed a bad query request', ()=>{
+        return request(app)
+        .get('/api/articles?sort_by=tite&order=asc')
+        .expect(400)
+    })
+    test('should respond with articles sorted in ascending order when passed order=asc as a query', ()=>{
+        return request(app)
+        .get('/api/articles?sort_by=title&order=asc').then(({body})=>{
+            expect(body).toBeSortedBy('title',{ascending : true})
         })
     })
 })
@@ -412,20 +445,4 @@ describe('GET /api/users', ()=>{
     })
 })
 
-describe.only('commment_count FEATURE ADDED GET /api/articles/:article_id', ()=>{
-    test('sould return an article with a comment_count property reflecting the number of comments the article has recieved', ()=>{
-        return request(app)
-        .get('/api/articles/3').then(({body})=>{
-            expect(body).toEqual({
-                comment_count: 2,
-                article_id: 3,
-                title: 'Eight pug gifs that remind me of mitch',
-                topic: 'mitch',
-                author: 'icellusedkars',
-                created_at: '2020-11-03T09:12:00.000Z',
-                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-                votes: 0
-              })
-        })
-    })
-})
+
