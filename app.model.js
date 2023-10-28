@@ -48,7 +48,7 @@ exports.fetchAllArticles = (topic, sort_by='created_at', order='DESC')=>{
     queryArr.push(order) 
     
     queryStr += `GROUP BY articles.article_id` 
-    queryStr += sort_by==='comment_count' ? ` ORDER BY articles.%I %s;`
+    queryStr += sort_by==='comment_count' ? ` ORDER BY %I %s;`
 : ` ORDER BY articles.%I %s;`
     return db.query(format(queryStr, ...queryArr))
     .then(({rows})=>{
