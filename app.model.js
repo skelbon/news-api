@@ -35,7 +35,7 @@ exports.fetchAllArticles = (topic, sort_by='created_at', order='DESC')=>{
     
     
     let queryStr = `SELECT CAST(COUNT(comments) AS INT) AS 
-    articles.comment_count, articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
+    comment_count, articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.article_img_url, articles.votes, articles.article_id FROM articles 
     LEFT JOIN comments 
     ON articles.article_id = comments.article_id `
     
@@ -47,8 +47,9 @@ exports.fetchAllArticles = (topic, sort_by='created_at', order='DESC')=>{
     queryArr.push(sort_by)
     queryArr.push(order) 
     
-    queryStr += `GROUP BY articles.article_id 
-                 ORDER BY articles.%I %s;`
+    queryStr += `GROUP BY articles.article_id` 
+    queryStr += sort_by==='comment_count' ? `ORDER BY %I %s;`
+: `ORDER BY articles.%I %s;`
     return db.query(format(queryStr, ...queryArr))
     .then(({rows})=>{
         return rows
