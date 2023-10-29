@@ -116,6 +116,7 @@ describe('GET /api/articles/:article_id', ()=>{
                 comment_count: 2,
                 article_id: 3,
                 title: 'Eight pug gifs that remind me of mitch',
+                body: 'some gifs',
                 topic: 'mitch',
                 author: 'icellusedkars',
                 created_at: '2020-11-03T09:12:00.000Z',
@@ -180,8 +181,8 @@ describe('GET /api/articles', ()=>{
     })
     test('should respond with articles sorted by whichever field is given in the sort_by query descending by default', ()=>{
         return request(app)
-        .get('/api/articles?sort_by=title').then(({body})=>{
-            expect(body).toBeSortedBy('title',{descending : true})
+        .get('/api/articles?sort_by=comment_count').then(({body})=>{
+            expect(body).toBeSortedBy('comment_count',{descending : true})
         })
     })
     test('should respond with status 400 when passed a bad query request', ()=>{
