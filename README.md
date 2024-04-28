@@ -1,6 +1,6 @@
 # NC News API 
 
-[A hosted instance of this API can be found here](https://skelbon-news-api.onrender.com)
+[A hosted instance of this API can be found here](https://skelbon-news-api.onrender.com/api)
 
 ## Table of Contents
 
