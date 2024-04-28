@@ -8,9 +8,9 @@ app.use(express.json())
 
 app.use('/api', apiRouter)
 
-// app.all('/*', (req, res, next)=>{
-//     res.status(404).send({message: 'Path not found'})
-// })
+app.all('/*', (req, res, next) => {
+    res.status(404).send({ message: 'Path not found' })
+})
 
 app.use((err, req, res, next) => {
     if (err.code === '22P02' || err.code === '23502' || err === 400)
